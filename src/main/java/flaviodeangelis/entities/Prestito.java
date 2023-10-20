@@ -32,6 +32,7 @@ public class Prestito {
         this.elemento = elemento;
     }
 
+
     @Override
     public String toString() {
         return "Prestito{" +
