@@ -43,8 +43,8 @@ public class ElementDAO {
     }
 
     public List<Books> getByAuthor(String author) {
-        TypedQuery<Books> getByAuthor = em.createQuery("SELECT b FROM Books b WHERE b.author = :author", Books.class);
-        getByAuthor.setParameter("author", author);
+        TypedQuery<Books> getByAuthor = em.createQuery("SELECT b FROM Books b WHERE b.author LIKE :author", Books.class);
+        getByAuthor.setParameter("author", "%" + author + "%");
         return getByAuthor.getResultList();
     }
 

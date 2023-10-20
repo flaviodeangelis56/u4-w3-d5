@@ -21,10 +21,6 @@ public class Application {
         ElementDAO eDAO = new ElementDAO(em);
         UtenteDAO uDAO = new UtenteDAO(em);
         PrestitoDAO pDAO = new PrestitoDAO(em);
-        Magazine test1 = new Magazine("L'infinito", 2019, 154, Periodicità.MENSILE);
-        //eDAO.save(test1);
-        //List<Element> archivio = new ArrayList<>();
-
 
         try {
             Scanner input = new Scanner(System.in);
@@ -33,7 +29,7 @@ public class Application {
 
                 try {
                     System.out.println("Inserisci 1 per aggiungere un elemento all'archivio, 2 per rimuovere un elemento tramite ISBN,3 per cercare un elemento tramite ISBN,4 per cercare un elemento con l'anno");
-                    System.out.println("Inserisci 5 per cercare un libro con il suo autore,6 per cercare un elemento con il titolo,7 per creare o eliminare un untente, 8 per entrare nell'area prestiti");
+                    System.out.println("Inserisci 5 per cercare un libro con il suo autore,6 per cercare un elemento con il titolo, 7 per creare, cercare o eliminare un untente, 8 per entrare nell'area prestiti");
                     inputChoose = Integer.parseInt(input.nextLine());
 
                     switch (inputChoose) {
@@ -105,6 +101,7 @@ public class Application {
                                 if (outputISBN == null) {
                                     throw new ISBNCercaException();
                                 } else {
+
                                     System.out.println(outputISBN);
                                 }
                             } catch (ISBNCercaException e) {
@@ -120,7 +117,7 @@ public class Application {
                                 if (outputAnno.isEmpty()) {
                                     throw new AnnoException();
                                 } else {
-                                    System.out.println(outputAnno);
+                                    outputAnno.forEach(System.out::println);
                                 }
                             } catch (AnnoException e) {
                                 System.err.println("ERRORE : " + e.getMessage());
@@ -146,7 +143,7 @@ public class Application {
                             break;
                         case 6:
                             try {
-                                System.out.println("Inserisci un titolo per cercare un elemento nel di nel DB");
+                                System.out.println("Inserisci un titolo per cercare un elemento nel DB");
                                 String inputTitle = input.nextLine();
 
                                 List<Element> outputTitolo = eDAO.getByTitle(inputTitle);
@@ -161,7 +158,7 @@ public class Application {
                             break;
                         case 7:
                             try {
-                                System.out.println("Inserisci 1 per creare un Utente, 2 per eliminarlo tramite numero tessera");
+                                System.out.println("Inserisci 1 per creare un Utente, 2 per eliminarlo tramite numero tessera,3 per cercarlo tramite il numero tessera,4 per cercarlo tramite nome");
                                 inputChoose = Integer.parseInt(input.nextLine());
                                 switch (inputChoose) {
                                     case 1:
@@ -196,6 +193,17 @@ public class Application {
                                         System.out.println("Inserisci numero tessera utente per eliminarlo dal DB : ");
                                         int inputNumeroTessera = Integer.parseInt(input.nextLine());
                                         uDAO.delate(inputNumeroTessera);
+                                        break;
+                                    case 3:
+                                        System.out.println("Inserisci numero tessera utente per cercare l'utente nel DB : ");
+                                        int inputNumeroTesseraCerca = Integer.parseInt(input.nextLine());
+                                        System.out.println(uDAO.getByNumeroTessera(inputNumeroTesseraCerca));
+                                        break;
+                                    case 4:
+                                        System.out.println("Inserisci nome utente per cercare l'utente nel DB : ");
+                                        String inputNomeCerca = input.nextLine();
+                                        System.out.println(uDAO.getByName(inputNomeCerca));
+                                        break;
                                     default:
                                         throw new ChooseInputException();
                                 }
