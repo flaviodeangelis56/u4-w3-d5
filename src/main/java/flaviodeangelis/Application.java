@@ -1,15 +1,12 @@
 package flaviodeangelis;
 
-import flaviodeangelis.entities.Books;
-import flaviodeangelis.entities.ElementDAO;
-import flaviodeangelis.entities.Magazine;
-import flaviodeangelis.entities.Periodicità;
-import flaviodeangelis.exception.ChooseInputException;
-import flaviodeangelis.exception.ElementException;
-import flaviodeangelis.exception.InputAnnoException;
+import flaviodeangelis.entities.*;
+import flaviodeangelis.exception.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Scanner;
 
 import static flaviodeangelis.utils.JpaUtil.getEntityManagerFactory;
@@ -22,6 +19,8 @@ public class Application {
         System.out.println("Hello World!");
         EntityManager em = emf.createEntityManager();
         ElementDAO eDAO = new ElementDAO(em);
+        UtenteDAO uDAO = new UtenteDAO(em);
+        PrestitoDAO pDAO = new PrestitoDAO(em);
         Magazine test1 = new Magazine("L'infinito", 2019, 154, Periodicità.MENSILE);
         //eDAO.save(test1);
         //List<Element> archivio = new ArrayList<>();
@@ -34,7 +33,7 @@ public class Application {
 
                 try {
                     System.out.println("Inserisci 1 per aggiungere un elemento all'archivio, 2 per rimuovere un elemento tramite ISBN,3 per cercare un elemento tramite ISBN,4 per cercare un elemento con l'anno");
-                    System.out.println("Inserisci 5 per cercare un libro con il suo autore,6 per salvare l'archivio sul disco,7 per leggere l'archivio salvato sul disco,0 per interrompere");
+                    System.out.println("Inserisci 5 per cercare un libro con il suo autore,6 per cercare un elemento con il titolo,7 per creare o eliminare un untente");
                     inputChoose = Integer.parseInt(input.nextLine());
 
                     switch (inputChoose) {
@@ -42,7 +41,7 @@ public class Application {
                             break;
                         case 1:
                             try {
-                                System.out.println("Inserisci book per aggiunere un libro, magazine per aggiungere una rivista");
+                                System.out.println("Inserisci book per aggiunere un libro, magazine per aggiungere una rivista nel DB");
                                 String inputCreazione = input.nextLine();
                                 if (inputCreazione.toLowerCase().trim().equals("book")) {
                                     System.out.println("Come si chiama il tuo libro : ");
@@ -89,96 +88,132 @@ public class Application {
                             } catch (ElementException e) {
                                 System.out.println("ERRORE : " + e.getMessage());
                             } catch (InputAnnoException e) {
-                                System.out.println("ERRORE : " + e.getMessage());
+                                System.err.println("ERRORE : " + e.getMessage());
                             }
 
                             break;
                         case 2:
-                            System.out.println("Inserisci un codice ISBN per rimuovere quell'elemento dall'archivio");
+                            System.out.println("Inserisci un codice ISBN per rimuovere quell'elemento dall'DB");
                             long inputISBN = Integer.parseInt(input.nextLine());
                             eDAO.delate(inputISBN);
                             break;
-//                        case 3:
-//                            try {
-//                                System.out.println("Inserisci un codice ISBN per cercare un libro");
-//                                long inputISBNCerca = Integer.parseInt(input.nextLine());
-//                                List<Element> outputISBN = archivio.stream().filter(element -> element.getISBN() == inputISBNCerca).toList();
-//                                if (outputISBN.isEmpty()) {
-//                                    throw new ISBNCercaException();
-//                                } else {
-//                                    System.out.println(outputISBN);
-//                                }
-//                            } catch (ISBNCercaException e) {
-//                                System.out.println("ERRORE : " + e.getMessage());
-//                            }
-//
-//                            break;
-//                        case 4:
-//                            try {
-//                                System.out.println("Inserisci un anno per cercare un libro");
-//                                int inputAnnoCerca = Integer.parseInt(input.nextLine());
-//                                List<Element> outputAnno = archivio.stream().filter(element -> element.getYearOfPublication() == inputAnnoCerca).toList();
-//                                if (outputAnno.isEmpty()) {
-//                                    throw new AnnoException();
-//                                } else {
-//                                    System.out.println(outputAnno);
-//                                }
-//                            } catch (AnnoException e) {
-//                                System.out.println("ERRORE : " + e.getMessage());
-//                            }
-//
-//                            break;
-//                        case 5:
-//                            try {
-//                                System.out.println("Inserisci un autore per cercare un libro");
-//                                String inputAutoreCerca = input.nextLine();
-//                                List<Books> booksList = new ArrayList<>();
-//                                for (int i = 0; i < archivio.size(); i++) {
-//                                    if (archivio.get(i) instanceof Books) {
-//                                        booksList.add((Books) archivio.get(i));
-//                                    }
-//                                }
-//                                List<Books> outputAutore = booksList.stream().filter(element -> element.getAuthor().equals(inputAutoreCerca)).toList();
-//                                if (outputAutore.isEmpty()) {
-//                                    throw new AutoreException();
-//                                } else {
-//                                    System.out.println(outputAutore);
-//                                }
-//                            } catch (AutoreException e) {
-//                                System.out.println("ERRORE : " + e.getMessage());
-//                            }
-//
-//
-//                            break;
-//                        case 6:
-//                            try {
-//                                FileUtils.writeStringToFile(file, archivio.toString(), StandardCharsets.UTF_8);
-//                                break;
-//                            } catch (IOException e) {
-//                                throw new RuntimeException(e);
-//                            }
-//                        case 7:
-//                            try {
-//                                String filetext = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-//                                System.out.println(filetext);
-//                                break;
-//                            } catch (IOException e) {
-//                                throw new RuntimeException(e);
-//
-//                            }
+                        case 3:
+                            try {
+                                System.out.println("Inserisci un codice ISBN per cercare un elemento nel DB");
+                                long inputISBNCerca = Integer.parseInt(input.nextLine());
+                                Element outputISBN = eDAO.getByIsbn(inputISBNCerca);
+                                if (outputISBN == null) {
+                                    throw new ISBNCercaException();
+                                } else {
+                                    System.out.println(outputISBN);
+                                }
+                            } catch (ISBNCercaException e) {
+                                System.err.println("ERRORE : " + e.getMessage());
+                            }
+
+                            break;
+                        case 4:
+                            try {
+                                System.out.println("Inserisci un anno per cercare tutti gli elementi usciti in quell'anno nel DB");
+                                int inputAnnoCerca = Integer.parseInt(input.nextLine());
+                                List<Element> outputAnno = eDAO.getByYearOfPublication(inputAnnoCerca);
+                                if (outputAnno.isEmpty()) {
+                                    throw new AnnoException();
+                                } else {
+                                    System.out.println(outputAnno);
+                                }
+                            } catch (AnnoException e) {
+                                System.err.println("ERRORE : " + e.getMessage());
+                            }
+
+                            break;
+                        case 5:
+                            try {
+                                System.out.println("Inserisci un autore per cercare tutti i libri di quest'ultimo nel DB");
+                                String inputAutoreCerca = input.nextLine();
+
+                                List<Books> outputAutore = eDAO.getByAuthor(inputAutoreCerca);
+                                if (outputAutore.isEmpty()) {
+                                    throw new AutoreException();
+                                } else {
+                                    outputAutore.forEach(System.out::println);
+                                }
+                            } catch (AutoreException e) {
+                                System.err.println("ERRORE : " + e.getMessage());
+                            }
+
+
+                            break;
+                        case 6:
+                            try {
+                                System.out.println("Inserisci un titolo per cercare un elemento nel di nel DB");
+                                String inputTitle = input.nextLine();
+
+                                List<Element> outputTitolo = eDAO.getByTitle(inputTitle);
+                                if (outputTitolo.isEmpty()) {
+                                    throw new AutoreException();
+                                } else {
+                                    outputTitolo.forEach(System.out::println);
+                                }
+                            } catch (AutoreException e) {
+                                System.err.println("ERRORE : " + e.getMessage());
+                            }
+                            break;
+                        case 7:
+                            try {
+                                System.out.println("Inserisci 1 per creare un Utente, 2 per eliminarlo tramite numero tessera");
+                                inputChoose = Integer.parseInt(input.nextLine());
+                                switch (inputChoose) {
+                                    case 1:
+                                        System.out.println("Inserisci nome utente : ");
+                                        String inputNome = input.nextLine();
+                                        System.out.println("Inserisci cogome utente : ");
+                                        String inputCognome = input.nextLine();
+                                        System.out.println("Inserisci anno di nascita : ");
+                                        int inputAnno = Integer.parseInt(input.nextLine());
+                                        System.out.println("Inserisci mese di nascita : ");
+                                        int inputMese = Integer.parseInt(input.nextLine());
+                                        System.out.println("Inserisci giorno di nascita : ");
+                                        int inputgiorno = Integer.parseInt(input.nextLine());
+                                        Utente testUtente = new Utente(inputNome, inputCognome, LocalDate.of(inputAnno, inputMese, inputgiorno));
+                                        uDAO.save(testUtente);
+                                        break;
+                                    case 2:
+                                        System.out.println("Inserisci numero tessera utente per eliminarlo dal DB : ");
+                                        int inputNumeroTessera = Integer.parseInt(input.nextLine());
+                                        uDAO.delate(inputNumeroTessera);
+                                    default:
+                                        throw new ChooseInputException();
+                                }
+
+                            } catch (Exception e) {
+                                System.err.println(e.getMessage());
+
+                            }
+                            break;
+                        case 8:
+                            Utente utentePrestito = uDAO.getByNumeroTessera(99019003);
+                            Element elementPrestito = eDAO.getByIsbn(82724707);
+                            Prestito testPrestito = new Prestito(LocalDate.of(2022, 10, 20), null, utentePrestito, elementPrestito);
+                            pDAO.save(testPrestito);
+                            List<Prestito> listaPrestitiUtente = pDAO.getPrestitoByNumeroTesseraUtente(99019003);
+                            listaPrestitiUtente.forEach(System.out::println);
+                            List<Prestito> listaPrestitiScaduti = pDAO.getPrestitoScaduto();
+                            listaPrestitiScaduti.forEach(System.out::println);
+                            break;
                         default:
                             throw new ChooseInputException();
                     }
                 } catch (ChooseInputException e) {
-                    System.out.println("ERRORE : " + e.getMessage());
+                    System.err.println("ERRORE : " + e.getMessage());
                 } catch (Exception e) {
-                    System.out.println("ERRORE : " + e.getMessage());
+                    System.err.println("ERRORE : " + e.getMessage());
                 }
             } while (inputChoose != 0);
 
             input.close();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
         }
 
     }

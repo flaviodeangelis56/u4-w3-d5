@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 @Entity
+@Table(name = "elements")
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Element {
     @Id
@@ -37,6 +38,17 @@ public abstract class Element {
         return yearOfPublication;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public int getNumberOfPage() {
+        return numberOfPage;
+    }
+
+    public List<Prestito> getPrestiti() {
+        return prestiti;
+    }
 
     @Override
     public String toString() {

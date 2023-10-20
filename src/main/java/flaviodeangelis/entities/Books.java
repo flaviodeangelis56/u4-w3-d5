@@ -26,6 +26,10 @@ public class Books extends Element {
     @Override
     public String toString() {
         return "Books{" +
+                "ISBN=" + getISBN() +
+                ", title='" + getTitle() + '\'' +
+                ", yearOfPublication=" + getYearOfPublication() +
+                ", numberOfPage=" + getNumberOfPage() +
                 "author='" + author + '\'' +
                 ", type='" + type + '\'' +
                 '}';

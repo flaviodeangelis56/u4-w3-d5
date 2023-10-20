@@ -4,7 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Random;
 
@@ -15,14 +15,14 @@ public class Utente {
     long numeroDiTessera;
     private String nome;
     private String cognome;
-    private Date dataDiNascita;
+    private LocalDate dataDiNascita;
     @OneToMany(mappedBy = "elemento")
     private List<Prestito> prestiti;
 
     public Utente() {
     }
 
-    public Utente(String nome, String cognome, Date dataDiNascita) {
+    public Utente(String nome, String cognome, LocalDate dataDiNascita) {
         Random rndm = new Random();
         this.numeroDiTessera = rndm.nextInt(0, 99999999);
         this.nome = nome;

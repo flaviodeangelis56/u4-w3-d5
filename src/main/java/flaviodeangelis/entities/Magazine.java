@@ -23,6 +23,10 @@ public class Magazine extends Element {
     @Override
     public String toString() {
         return "Magazine{" +
+                "ISBN=" + getISBN() +
+                ", title='" + getTitle() + '\'' +
+                ", yearOfPublication=" + getYearOfPublication() +
+                ", numberOfPage=" + getNumberOfPage() +
                 "periodicità=" + periodicità +
                 '}';
     }
